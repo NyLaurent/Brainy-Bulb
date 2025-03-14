@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainy Bulb</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-hover: #059669;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .lamp-container {
+            position: relative;
+            width: 240px;
+            height: 280px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .lamp-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 18px;
+            background: linear-gradient(to bottom, #64748b, #475569);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .lamp-stand {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 100px;
+            background: linear-gradient(to right, #334155, #475569, #334155);
+            border-radius: 5px;
+        }
+
+        .lamp-shade {
+            position: absolute;
+            bottom: 118px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(5deg);
+            width: 140px;
+            height: 80px;
+            background: linear-gradient(to bottom, #475569, #334155);
+            border-radius: 70px 70px 0 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .lamp-bulb {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(10px);
+        }
+
+        .lamp-glow {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            filter: blur(20px);
+        }
+
+        .slider-container {
+            position: relative;
+            height: 36px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 8px;
+            background: rgba(51, 65, 85, 0.8);
+            outline: none;
+            overflow: hidden;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            position: relative;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .slider::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 8px;
+        }
+
+        .slider::-moz-range-track {
+            height: 8px;
+            border-radius: 8px;
+        }
+
+        .switch-btn {
+            padding: 16px 30px;
+            border-radius: 16px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .switch-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: -1;
+        }
+
+        .switch-on {
+            background: linear-gradient(135deg, var(--primary-color), #0d9488);
+            color: white;
+        }
+
+        .switch-on:hover {
+            background: linear-gradient(135deg, var(--primary-hover), #0f766e);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .switch-off {
+            background: linear-gradient(135deg, #475569, #334155);
+            color: white;
+        }
+
+        .switch-off:hover {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .tab-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .tab.active::before {
+            width: 70%;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0 12px 12px 12px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scene-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: -1;
+        }
+
+        .scene-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .scene-btn.active {
+            border-color: var(--primary-color);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .scene-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .scene-btn:hover .scene-icon {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .scene-btn.active .scene-icon {
+            background: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .control-label {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .value-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .glass-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.05) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-6">
+    <div class="floating-particles">
+        <div class="particle" style="left: 10%; animation-duration: 20s; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-duration: 25s; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-duration: 18s; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-duration: 22s; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 50%; animation-duration: 15s; animation-delay: 8s;"></div>
+        <div class="particle" style="left: 60%; animation-duration: 28s; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 70%; animation-duration: 19s; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 80%; animation-duration: 26s; animation-delay: 14s;"></div>
+        <div class="particle" style="left: 90%; animation-duration: 23s; animation-delay: 16s;"></div>
+    </div>
+
+    <div class="card p-8 w-full max-w-md glass-effect">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text">Brainy Bulb</h1>
+                <p class="text-gray-400 text-lg">Be the DJ of your room’s mood</p>
+            </div>
+            <div id="status" class="status-badge">
+                Waiting for connection...
+            </div>
+        </div>
+
+        <div class="lamp-container mb-10">
+            <div class="lamp-base"></div>
+            <div class="lamp-stand"></div>
+            <div class="lamp-shade">
+                <div id="bulb" class="lamp-bulb" style="background: #475569;"></div>
+            </div>
+            <div id="glow" class="lamp-glow"
+                style="background: radial-gradient(circle, rgba(255,234,167,0.5) 0%, rgba(0,0,0,0) 70%); opacity: 0;">
+            </div>
+        </div>
+
+        <div class="flex gap-5 mb-10">
+            <button id="onBtn" onclick="sendCommand('ON')"
+                class="switch-btn switch-on flex-1 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <path
+                        d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5">
+                    </path>
+                    <path d="M9 18h6"></path>
+                    <path d="M10 22h4"></path>
+                </svg>
+                Power On
+            </button>
+            <button id="offBtn" onclick="sendCommand('OFF')"
+                class="switch-btn switch-off flex-1 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                    <path d="M18.36 6.64A9 9 0 0 1 20.77 15"></path>
+                    <path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"></path>
+                    <path d="M12 2v4"></path>
+                    <path d="m2 2 20 20"></path>
+                </svg>
+                Power Off
+            </button>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex mb-2 tab-container">
+                <div class="tab active" onclick="switchTab('controls')">Controls</div>
+                <div class="tab" onclick="switchTab('scenes')">Scenes</div>
+            </div>
+
+            <div id="controls-tab" class="tab-content active">
+                <!-- Brightness Control -->
+                <div class="mb-8">
+                    <div class="flex justify-between mb-3">
+                        <span class="text-gray-300 flex items-center control-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="mr-2">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <path d="M12 1v2"></path>
+                                <path d="M12 21v2"></path>
+                                <path d="M4.22 4.22l1.42 1.42"></path>
+                                <path d="M18.36 18.36l1.42 1.42"></path>
+                                <path d="M1 12h2"></path>
+                                <path d="M21 12h2"></path>
+                                <path d="M4.22 19.78l1.42-1.42"></path>
+                                <path d="M18.36 5.64l1.42-1.42"></path>
+                            </svg>
+                            Brightness
+                        </span>
+                        <span id="brightness-value" class="value-badge">80%</span>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" min="5" max="100" value="80" class="slider" id="brightness-slider"
+                            onchange="changeBrightness(this.value)" oninput="updateBrightnessValue(this.value)">
+                    </div>
+                </div>
+
+                <!-- Temperature Control -->
+                <div>
+                    <div class="flex justify-between mb-3">
+                        <span class="text-gray-300 flex items-center control-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="mr-2">
+                                <path d="M12 9a4 4 0 0 0-2 7.5"></path>
+                                <path d="M12 3v2"></path>
+                                <path d="m6.6 18.4-1.4 1.4"></path>
+                                <path d="M20 4v-.5a.5.5 0 0 0-.5-.5H17"></path>
+                                <path d="M13.3 7.3 12 8"></path>
+                                <path d="M4 13H3"></path>
+                                <path d="M5 21c0-1.5 1-2 2-2h10c1 0 2 .5 2 2"></path>
+                                <path d="M19 4v16"></path>
+                                <path d="M7 4v16"></path>
+                            </svg>
+                            Temperature
+                        </span>
+                        <span id="temperature-value" class="value-badge">50%</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-amber-300 text-xs font-medium">Warm</span>
+                        <div class="slider-container flex-1">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="temperature-slider"
+                                onchange="changeTemperature(this.value)" oninput="updateTemperatureValue(this.value)">
+                        </div>
+                        <span class="text-blue-300 text-xs font-medium">Cool</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scenes-tab" class="tab-content">
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="scene-btn" onclick="applyScene('reading')">
+                        <div class="scene-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                fill="none" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-center mt-3 font-medium">Reading</div>
+                    </div>
+
+                    <div class="scene-btn" onclick="applyScene('movie')">
+                        <div class="scene-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                fill="none" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect width="20" height="15" x="2" y="7" rx="2" ry="2"></rect>
+                                <polyline points="17 2 12 7 7 2"></polyline>
+                            </svg>
+                        </div>
+                        <div class="text-center mt-3 font-medium">Movie</div>
+                    </div>
+
+                    <div class="scene-btn" onclick="applyScene('relax')">
+                        <div class="scene-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                fill="none" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M9 18V5l12-2v13"></path>
+                                <circle cx="6" cy="18" r="3"></circle>
+                                <circle cx="18" cy="16" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="text-center mt-3 font-medium">Relax</div>
+                    </div>
+
+                    <div class="scene-btn" onclick="applyScene('energize')">
+                        <div class="scene-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                                fill="none" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                                <line x1="6" x2="6" y1="1" y2="4"></line>
+                                <line x1="10" x2="10" y1="1" y2="4"></line>
+                                <line x1="14" x2="14" y1="1" y2="4"></line>
+                            </svg>
+                        </div>
+                        <div class="text-center mt-3 font-medium">Energize</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        const bulb = document.getElementById('bulb');
+        const glow = document.getElementById('glow');
+        const statusDiv = document.getElementById('status');
+        const brightnessSlider = document.getElementById('brightness-slider');
+        const temperatureSlider = document.getElementById('temperature-slider');
+        const client = mqtt.connect('ws://157.173.101.159:9001');
+
+        let currentState = 'OFF';
+        let brightness = 80;
+        let temperature = 50;
+        let activeScene = '';
+
+        client.on('connect', () => {
+            console.log('Connected to MQTT broker');
+            statusDiv.innerText = 'Connected';
+            statusDiv.style.background = 'rgba(16, 185, 129, 0.2)';
+            statusDiv.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        });
+
+        client.on('error', (error) => {
+            console.error('MQTT connection error:', error);
+            statusDiv.innerText = 'Connection error';
+            statusDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+            statusDiv.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        });
+
+        function sendCommand(state) {
+            const topic = '/laurent/light_control';
+            if (state === currentState) return;
+
+            client.publish(topic, state, () => {
+                currentState = state;
+                statusDiv.innerText = `Light is ${state.toLowerCase()}`;
+                if (state === 'ON') {
+                    statusDiv.style.background = 'rgba(16, 185, 129, 0.2)';
+                    statusDiv.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                } else {
+                    statusDiv.style.background = 'rgba(255, 255, 255, 0.08)';
+                    statusDiv.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                }
+                updateUI();
+            });
+        }
+
+        function updateUI() {
+            if (currentState === 'ON') {
+                bulb.style.backgroundColor = getLightColor();
+                bulb.style.boxShadow = `0 0 ${40 * brightness / 100}px ${20 * brightness / 100}px ${getLightColor()}`;
+                bulb.style.transform = 'translateY(0)';
+                glow.style.opacity = brightness / 100 * 0.8;
+                glow.style.background = `radial-gradient(circle, ${getLightColor()} 0%, rgba(0,0,0,0) 70%)`;
+
+                brightnessSlider.disabled = false;
+                temperatureSlider.disabled = false;
+
+                document.querySelectorAll('.scene-btn').forEach(btn => {
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
+            } else {
+                bulb.style.backgroundColor = '#475569';
+                bulb.style.boxShadow = 'none';
+                bulb.style.transform = 'translateY(10px)';
+                glow.style.opacity = '0';
+
+                brightnessSlider.disabled = true;
+                temperatureSlider.disabled = true;
+
+                document.querySelectorAll('.scene-btn').forEach(btn => {
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                });
+
+                // Reset active scene
+                document.querySelectorAll('.scene-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                activeScene = '';
+            }
+        }
+
+        function getLightColor() {
+            // Interpolate between warm yellow and cool white based on temperature
+            const warmColor = [255, 234, 167];
+            const coolColor = [240, 248, 255];
+            
+            const ratio = temperature / 100;
+            const r = Math.round(warmColor[0] * (1 - ratio) + coolColor[0] * ratio);
+            const g = Math.round(warmColor[1] * (1 - ratio) + coolColor[1] * ratio);
+            const b = Math.round(warmColor[2] * (1 - ratio) + coolColor[2] * ratio);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function changeBrightness(value) {
+            brightness = parseInt(value);
+            updateUI();
+            
+            // Send brightness command to MQTT
+            const topic = '/thehacker/light_brightness';
+            client.publish(topic, brightness.toString());
+        }
+
+        function updateBrightnessValue(value) {
+            document.getElementById('brightness-value').innerText = `${value}%`;
+            brightness = parseInt(value);
+            if (currentState === 'ON') {
+                updateUI();
+            }
+        }
+
+        function changeTemperature(value) {
+            temperature = parseInt(value);
+            updateUI();
+            
+            // Send temperature command to MQTT
+            const topic = '/thehacker/light_temperature';
+            client.publish(topic, temperature.toString());
+        }
+
+        function updateTemperatureValue(value) {
+            document.getElementById('temperature-value').innerText = `${value}%`;
+            temperature = parseInt(value);
+            if (currentState === 'ON') {
+                updateUI();
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate selected tab and content
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`.tab:nth-child(${tabName === 'controls' ? 1 : 2})`).classList.add('active');
+        }
+
+        function applyScene(scene) {
+            if (currentState === 'OFF') return;
+            
+            // Remove active class from all scene buttons
+            document.querySelectorAll('.scene-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to selected scene button
+            document.querySelector(`.scene-btn:nth-child(${
+                scene === 'reading' ? 1 : 
+                scene === 'movie' ? 2 : 
+                scene === 'relax' ? 3 : 4
+            })`).classList.add('active');
+            
+            activeScene = scene;
+            
+            // Apply scene-specific settings
+            switch(scene) {
+                case 'reading':
+                    brightness = 90;
+                    temperature = 70;
+                    break;
+                case 'movie':
+                    brightness = 30;
+                    temperature = 30;
+                    break;
+                case 'relax':
+                    brightness = 50;
+                    temperature = 20;
+                    break;
+                case 'energize':
+                    brightness = 100;
+                    temperature = 100;
+                    break;
+            }
+            
+            // Update UI and sliders
+            brightnessSlider.value = brightness;
+            temperatureSlider.value = temperature;
+            document.getElementById('brightness-value').innerText = `${brightness}%`;
+            document.getElementById('temperature-value').innerText = `${temperature}%`;
+            updateUI();
+            
+            // Send scene command to MQTT
+            const topic = '/laurent/light_scene';
+            client.publish(topic, scene);
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.querySelector('.floating-particles');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${15 + Math.random() * 15}s`;
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                particle.style.width = `${2 + Math.random() * 6}px`;
+                particle.style.height = particle.style.width;
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize UI and particles
+        updateUI();
+        createParticles();
+    </script>
+</body>
+
+</html>
